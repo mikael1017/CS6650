@@ -12,11 +12,23 @@ public class ClientThread extends Thread {
   private static final int RANDOMSTRING_LENGTH = 256;
   private static final int MAX_RETRIES = 5;
 
-  private final static int NUM_REQUESTS = 2500;
+  private final static int NUM_REQUESTS = 10000;
   private final CountDownLatch latch;
+  private final RequestCounter counter;
+  private final RequestCounter failCounter;
+  private final LatencyCounter latencyCounter;
 
-  public ClientThread(CountDownLatch latch) {
+  public ClientThread() {
+    this.latch = null;
+    this.counter = null;
+    this.failCounter = null;
+    this.latencyCounter = null;
+  }
+  public ClientThread(CountDownLatch latch, RequestCounter counter, RequestCounter failCounter, LatencyCounter latencyCounter) {
     this.latch = latch;
+    this.counter = counter;
+    this.failCounter = failCounter;
+    this.latencyCounter = latencyCounter;
   }
 
   public  void run() {
@@ -59,6 +71,7 @@ public class ClientThread extends Thread {
           System.out.println(result);
           long delay = after - before;
           System.out.println("Latency : " + delay + " ms");
+          latencyCounter.add(delay);
           needToRetry = (result.equals("201")) ? false : true;
 
 
@@ -68,7 +81,9 @@ public class ClientThread extends Thread {
           System.out.println("try number : " + numRetry);
           System.out.println(e.getCode());
           numRetry++;
+          this.failCounter.inc();
         }
+        this.counter.inc();
       }
     }
     latch.countDown();
