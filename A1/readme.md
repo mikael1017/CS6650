@@ -1,4 +1,4 @@
-# Jaewoo CHo
+# Jaewoo Cho
 
 # Assignment 1
 
