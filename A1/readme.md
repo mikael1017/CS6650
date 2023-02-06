@@ -2,12 +2,17 @@
 
 # Assignment 1
 
-Twinder - Server program
-TwinderClient_Part2 - Task2 of the assignment
-TwinderClient_Part3 - Task3 of the assignment
-Part 1 singlethread result.png - result of task 2
-Part 2 100 thread result.png - result of task 3
-Task 4 plot.png - plot for task 4
+#### Twinder - Server program
+
+#### TwinderClient_Part2 - Task2 of the assignment
+
+#### TwinderClient_Part3 - Task3 of the assignment
+
+#### Part 1 singlethread result.png - result of task 2
+
+#### Part 2 100 thread result.png - result of task 3
+
+#### Task 4 plot.png - plot for task 4
 
 ## Client design
 
