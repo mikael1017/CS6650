@@ -1,8 +1,17 @@
 
 
+import com.opencsv.CSVWriter;
 import io.swagger.client.*;
 import io.swagger.client.model.*;
 import io.swagger.client.api.SwipeApi;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.CyclicBarrier;
@@ -18,7 +27,8 @@ public class ClientThread extends Thread {
   private final RequestCounter failCounter;
   private final LatencyCounter latencyCounter;
 
-  public ClientThread() {
+
+  public ClientThread() throws IOException {
     this.latch = null;
     this.counter = null;
     this.failCounter = null;
@@ -29,6 +39,7 @@ public class ClientThread extends Thread {
     this.counter = counter;
     this.failCounter = failCounter;
     this.latencyCounter = latencyCounter;
+
   }
 
   public  void run() {
@@ -43,6 +54,7 @@ public class ClientThread extends Thread {
 //  for each thread do this step
 //    ------------------------------
     for (int i = 0; i < NUM_REQUESTS; i++) {
+
 
       int swiper = random.nextInt(1, 5000);
       //    swiper = 5001;
@@ -74,7 +86,26 @@ public class ClientThread extends Thread {
           latencyCounter.add(delay);
           needToRetry = (result.equals("201")) ? false : true;
 
+          String dirName = "/Users/jaewoocho/Desktop/School_Work/CS6650/TwinderClient_Part3/src/main/java/result.csv";
+          File file = new File(dirName);
+          try {
+            FileWriter outputFile = new FileWriter(file, true);
+            CSVWriter writer = new CSVWriter(outputFile);
+            List<String[]> data = new ArrayList<String[]>();
+            DateFormat simple = new SimpleDateFormat(
+                "dd MMM yyyy HH:mm:ss:SSS Z");
 
+            // Creating date from milliseconds
+            // using Date() constructor
+            Date currentDate = new Date(before);
+            String startTime = simple.format(currentDate);
+            String latency = "" + delay;
+            String[] curData = {startTime, "POST", latency, result};
+            writer.writeNext(curData);
+            writer.close();
+          } catch (IOException e) {
+            e.printStackTrace();
+          }
         } catch (ApiException e) {
           needToRetry = true;
           System.err.println("Exception when calling SwipeApi#swipe");

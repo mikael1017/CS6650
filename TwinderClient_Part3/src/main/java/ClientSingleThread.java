@@ -1,4 +1,5 @@
 
+import java.io.IOException;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.CyclicBarrier;
@@ -6,7 +7,8 @@ import java.util.concurrent.CyclicBarrier;
 public class ClientSingleThread {
   static CyclicBarrier barrier;
 
-  public static void main(String[] args) throws BrokenBarrierException, InterruptedException {
+  public static void main(String[] args)
+      throws BrokenBarrierException, InterruptedException, IOException {
 
     new ClientThread().start();
 
