@@ -18,12 +18,7 @@ public class ClientThread extends Thread {
   private final RequestCounter failCounter;
   private final LatencyCounter latencyCounter;
 
-  public ClientThread() {
-    this.latch = null;
-    this.counter = null;
-    this.failCounter = null;
-    this.latencyCounter = null;
-  }
+
   public ClientThread(CountDownLatch latch, RequestCounter counter, RequestCounter failCounter, LatencyCounter latencyCounter) {
     this.latch = latch;
     this.counter = counter;
