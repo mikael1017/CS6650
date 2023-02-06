@@ -2,6 +2,13 @@
 
 # Assignment 1
 
+Twinder - Server program
+TwinderClient_Part2 - Task2 of the assignment
+TwinderClient_Part3 - Task3 of the assignment
+Part 1 singlethread result.png - result of task 2
+Part 2 100 thread result.png - result of task 3
+Task 4 plot.png - plot for task 4
+
 ## Client design
 
 I created a Client Thread object that takes a CountDownLatch, requestCounter, latencyCounter as an input. Countdownlatch is used to keep the synchronization of threads. It allows other threads to wait until a set of operations being performed in other threads completes. basic structure of this class is that it goes into for loop that iterates the given number of requests then for each request, it generates a corresponding data according to the assignment spec.
