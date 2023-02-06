@@ -10,7 +10,7 @@ import org.HdrHistogram.Histogram;
 public class ClientMultiThreaded {
 
   public static void main(String[] args) throws BrokenBarrierException, InterruptedException {
-    final int NUMTHREADS = 50;
+    final int NUMTHREADS = 100;
 
     final RequestCounter counter = new RequestCounter();
     CountDownLatch completed = new CountDownLatch(NUMTHREADS);
@@ -32,7 +32,7 @@ public class ClientMultiThreaded {
     double avgLatency = latencyCounter.getVal() / (counter.getVal() + failCounter.getVal());
     Histogram histogram = new Histogram(10000L, 4);
     try {
-      String dirName = "/Users/jaewoocho/Desktop/School_Work/CS6650/TwinderClient_Part3/src/main/java/result.csv";
+      String dirName = "/Users/jaewoocho/Desktop/School_Work/CS6650/A1/TwinderClient_Part3/src/main/java/result.csv";
       CSVReader reader = new CSVReader(new FileReader(dirName));
       String[] nextLine;
       while ((nextLine = reader.readNext()) != null) {

@@ -19,7 +19,7 @@ public class ClientThread extends Thread {
   private static final int RANDOMSTRING_LENGTH = 256;
   private static final int MAX_RETRIES = 5;
 
-  private final static int NUM_REQUESTS = 10000;
+  private final static int NUM_REQUESTS = 5000;
   private final CountDownLatch latch;
   private final RequestCounter counter;
   private final RequestCounter failCounter;
@@ -49,13 +49,9 @@ public class ClientThread extends Thread {
 //        comment - random string of 256 characters
 
     ThreadLocalRandom random = ThreadLocalRandom.current();
-//  for each thread do this step
-//    ------------------------------
+    long startTestTime = System.currentTimeMillis();
     for (int i = 0; i < NUM_REQUESTS; i++) {
-
-
       int swiper = random.nextInt(1, 5000);
-      //    swiper = 5001;
       int swipee = random.nextInt(1, 1000000);
       boolean isLeft = random.nextBoolean();
       boolean needToRetry = true;
@@ -83,22 +79,16 @@ public class ClientThread extends Thread {
           System.out.println("Latency : " + delay + " ms");
           latencyCounter.add(delay);
           needToRetry = (result.equals("201")) ? false : true;
-
-          String dirName = "/Users/jaewoocho/Desktop/School_Work/CS6650/TwinderClient_Part3/src/main/java/result.csv";
+          long elapsedTime = ((after - startTestTime) / 1000) + 1;
+          String currentCount = String.valueOf(counter.getVal() + failCounter.getVal());
+          String dirName = "/Users/jaewoocho/Desktop/School_Work/CS6650/A1/TwinderClient_Part3/src/main/java/result.csv";
           File file = new File(dirName);
           try {
             FileWriter outputFile = new FileWriter(file, true);
             CSVWriter writer = new CSVWriter(outputFile);
-            List<String[]> data = new ArrayList<String[]>();
-            DateFormat simple = new SimpleDateFormat(
-                "dd MMM yyyy HH:mm:ss:SSS Z");
-
-            // Creating date from milliseconds
-            // using Date() constructor
-            Date currentDate = new Date(before);
-            String startTime = simple.format(currentDate);
+            String startTime = String.valueOf(elapsedTime);
             String latency = "" + delay;
-            String[] curData = {startTime, "POST", latency, result};
+            String[] curData = {startTime, "POST", latency, result, currentCount};
             writer.writeNext(curData);
             writer.close();
           } catch (IOException e) {
