@@ -53,7 +53,7 @@ import io.swagger.client.auth.OAuth;
 
 public class ApiClient {
 
-    private String basePath = "http://ec2-35-91-168-155.us-west-2.compute.amazonaws.com/Twinder_war/";
+    private String basePath = "http://ec2-52-43-238-189.us-west-2.compute.amazonaws.com:8080";
     private boolean debugging = false;
     private Map<String, String> defaultHeaderMap = new HashMap<String, String>();
     private String tempFolderPath = null;

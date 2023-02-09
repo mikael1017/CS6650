@@ -12,6 +12,9 @@ import java.io.IOException;
 public class TwinderServlet extends HttpServlet {
 
   final int RANDOMSTRING_LENGTH = 256;
+  final int MAX_SWIPER_NUM = 5000;
+  final int MAX_SWIPEE_NUM = 100000;
+  final int MIN_NUM = 1;
 
   @Override
   protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -63,7 +66,7 @@ public class TwinderServlet extends HttpServlet {
     if (json.get("comment").getAsString().length() != RANDOMSTRING_LENGTH) {
       return false;
     }
-    if (swiperNum > 5000 || swiperNum < 1 || swipeeNum > 1000000 || swipeeNum < 1) {
+    if (swiperNum > MAX_SWIPER_NUM || swiperNum < MIN_NUM || swipeeNum > MAX_SWIPEE_NUM || swipeeNum < MIN_NUM) {
       return false;
     }
     return true;
