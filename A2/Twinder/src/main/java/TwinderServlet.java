@@ -1,6 +1,7 @@
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import java.io.BufferedReader;
@@ -10,7 +11,6 @@ import javax.servlet.*;
 import javax.servlet.http.*;
 import javax.servlet.annotation.*;
 import java.io.IOException;
-import consumer.*;
 
 @WebServlet("/swipe")
 public class TwinderServlet extends HttpServlet {
@@ -19,36 +19,31 @@ public class TwinderServlet extends HttpServlet {
   final int MAX_SWIPER_NUM = 5000;
   final int MAX_SWIPEE_NUM = 1000000;
   final int MIN_NUM = 1;
-
-  private MapCounter likeCounter;
-  private MapCounter dislikeCounter;
-  private ListCounter potentialMatches;
   private ConnectionFactory factory;
   private Connection connection;
 
   @Override
   public void init() throws ServletException {
-    super.init();
-    this.likeCounter = new MapCounter();
-    this.dislikeCounter = new MapCounter();
-    this.potentialMatches = new ListCounter();
-    this.factory = new ConnectionFactory();
-    this.factory.setHost("ec2-35-89-76-232.us-west-2.compute.amazonaws.com");
-    this.factory.setUsername("jaewoo");
-    this.factory.setVirtualHost("cherry_broker");
-    this.factory.setPassword("wodn1017");
+    factory = new ConnectionFactory();
+    factory.setHost("ec2-54-187-74-227.us-west-2.compute.amazonaws.com");
+    factory.setUsername("jaewoo");
+    factory.setPassword("wodn1017");
+    factory.setVirtualHost("cherry_broker");
     try {
-      this.connection = this.factory.newConnection();
+      connection = factory.newConnection();
     } catch (IOException e) {
-      throw new RuntimeException(e);
+      throw new RuntimeException("Error initializing RMQ connection", e);
     } catch (TimeoutException e) {
       throw new RuntimeException(e);
     }
+    System.out.println(this.connection.toString());
   }
 
   @Override
   protected void doPost(HttpServletRequest request, HttpServletResponse response)
       throws ServletException, IOException {
+    Channel channel = this.connection.createChannel();
+    System.out.println(this.connection.toString());
     String urlPath = request.getPathInfo();
     PrintWriter out = response.getWriter();
     response.setCharacterEncoding("UTF-8");
@@ -67,7 +62,7 @@ public class TwinderServlet extends HttpServlet {
       json.addProperty("swipe", leftOrRight);
       statusMessage.setMessage("Created!");
       gson.toJson(statusMessage);
-      Producer queueProducer = new Producer(this.connection, json);
+      Producer queueProducer = new Producer(this.connection.createChannel(), json);
       System.out.println("Start sending a payload to rmq");
       try {
         queueProducer.send();

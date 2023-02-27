@@ -10,16 +10,18 @@ public class Producer {
   private final static String QUEUE_NAME = "Twinder";
   private static JsonObject payload = null;
   private Connection connection;
+  private Channel channel;
 
-  public Producer(Connection connection, JsonObject payload) {
+  public Producer(Channel channel, JsonObject payload) {
     this.payload = payload;
-    this.connection = connection;
+    this.channel = channel;
   }
 
   public void send() throws IOException, TimeoutException {
     System.out.println("Send method started");
     System.out.println(this.payload.toString());
-    Channel channel = this.connection.createChannel();
+    System.out.println("Create a new channel...");
+//    Channel channel = this.connection.createChannel();
     System.out.println("Created a new channel");
     channel.queueDeclare(QUEUE_NAME, false, false, false, null);
     System.out.println("Producer sending....");
