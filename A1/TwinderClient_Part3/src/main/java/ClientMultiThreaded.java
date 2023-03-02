@@ -10,7 +10,7 @@ import org.HdrHistogram.Histogram;
 public class ClientMultiThreaded {
 
   public static void main(String[] args) throws BrokenBarrierException, InterruptedException {
-    final int NUMTHREADS = 100;
+    final int NUMTHREADS = 10;
 
     final RequestCounter counter = new RequestCounter();
     CountDownLatch completed = new CountDownLatch(NUMTHREADS);
@@ -32,23 +32,23 @@ public class ClientMultiThreaded {
     double avgLatency = latencyCounter.getVal() / (counter.getVal() + failCounter.getVal());
     Histogram histogram = new Histogram(10000L, 4);
     try {
-      String dirName = "/Users/jaewoocho/Desktop/School_Work/CS6650/A1/TwinderClient_Part3/src/main/java/result.csv";
-      CSVReader reader = new CSVReader(new FileReader(dirName));
+//      String dirName = "/Users/jaewoocho/Desktop/School_Work/CS6650/A1/TwinderClient_Part3/src/main/java/result.csv";
+//      CSVReader reader = new CSVReader(new FileReader(dirName));
       String[] nextLine;
-      while ((nextLine = reader.readNext()) != null) {
-        int col = 1;
-        for (String token : nextLine) {
-          if (col == 3) {
-            histogram.recordValue(Long.valueOf(token));
-          }
-          col += 1;
-        }
-      }
-    } catch (IOException e) {
-      e.printStackTrace();
-    } catch (CsvValidationException e) {
-      throw new RuntimeException(e);
-    }
+////      while ((nextLine = reader.readNext()) != null) {
+////        int col = 1;
+////        for (String token : nextLine) {
+////          if (col == 3) {
+////            histogram.recordValue(Long.valueOf(token));
+////          }
+////          col += 1;
+////        }
+////      }
+//    } catch (IOException e) {
+//      e.printStackTrace();
+//    } catch (CsvValidationException e) {
+//      throw new RuntimeException(e);
+//    }
 
     System.out.println("terminating ....");
     System.out.println("Results: ");

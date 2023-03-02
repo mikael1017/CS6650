@@ -25,7 +25,7 @@ public class TwinderServlet extends HttpServlet {
   @Override
   public void init() throws ServletException {
     factory = new ConnectionFactory();
-    factory.setHost("ec2-54-185-201-229.us-west-2.compute.amazonaws.com");
+    factory.setHost("ec2-52-26-192-204.us-west-2.compute.amazonaws.com");
     factory.setUsername("jaewoo");
     factory.setPassword("wodn1017");
     factory.setVirtualHost("cherry_broker");

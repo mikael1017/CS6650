@@ -22,7 +22,7 @@ public class Consumer1 implements Runnable {
     try {
       Channel channel = connection.createChannel();
 //      channel.queueDeclare(QUEUE_NAME, false, false, false, null);
-
+      channel.basicQos(1);
       DeliverCallback deliverCallback = (consumerTag, delivery) -> {
         String message = new String(delivery.getBody(), "UTF-8");
 //      Things to do when the message is consumed
