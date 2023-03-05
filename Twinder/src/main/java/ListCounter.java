@@ -1,10 +1,12 @@
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 public class ListCounter {
   private Map<String, ArrayList<String>> counter;
   public ListCounter() {
-    counter = new HashMap<>();
+    this.counter = new ConcurrentHashMap<>();
   }
   synchronized public void add(String swiperId, String swipeeId) {
     if (!this.counter.containsKey(swiperId)) {

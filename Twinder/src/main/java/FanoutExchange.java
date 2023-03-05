@@ -22,7 +22,7 @@ public class FanoutExchange {
         channel.queueDeclare(QUEUE_NAME_2, true, false, false, null);
         channel.queueBind(QUEUE_NAME_2, EXCHANGE_NAME, ROUTING_KEY);
 
-        channel.close();
+//        channel.close();
       }
     }catch(Exception e){
       e.printStackTrace();

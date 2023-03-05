@@ -3,9 +3,8 @@ import com.rabbitmq.client.ConnectionFactory;
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
-public class Consumer1Jar {
+public class Consumer2Jar {
 
-  public static String QUEUE_NAME_1 = "fanout-queue-1";
   private static final int THREAD_NUM = 100;
   public static void main(String[] args) throws IOException, TimeoutException {
     ConnectionFactory factory = new ConnectionFactory();
@@ -20,14 +19,12 @@ public class Consumer1Jar {
     FanoutExchange ex = new FanoutExchange();
     ex.createExchangeAndQueue(connection);
     System.out.println("Consumer started");
-    System.out.println("Consumer 1");
-    MapCounter likeCounter = new MapCounter();
-    MapCounter dislikeCounter = new MapCounter();
-    Runnable consumer1 = new Consumer1(connection, likeCounter, dislikeCounter);
+    System.out.println("Consumer 2");
+    ListCounter potentialMatches = new ListCounter();
+    Runnable consumer2 = new Consumer2(connection, potentialMatches);
     for (int i = 0; i < THREAD_NUM; i++) {
-      new Thread(consumer1).start();
+      new Thread(consumer2).start();
     }
-
   }
 
 }

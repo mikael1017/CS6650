@@ -1,7 +1,6 @@
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import java.io.BufferedReader;
@@ -25,12 +24,15 @@ public class TwinderServlet extends HttpServlet {
   @Override
   public void init() throws ServletException {
     factory = new ConnectionFactory();
-    factory.setHost("ec2-52-26-192-204.us-west-2.compute.amazonaws.com");
+    factory.setHost("ec2-52-12-168-19.us-west-2.compute.amazonaws.com");
     factory.setUsername("jaewoo");
     factory.setPassword("wodn1017");
     factory.setVirtualHost("cherry_broker");
+    System.out.println("Initialized");
     try {
       connection = factory.newConnection();
+
+      System.out.println("hello");
     } catch (IOException e) {
       throw new RuntimeException("Error initializing RMQ connection", e);
     } catch (TimeoutException e) {
@@ -74,8 +76,6 @@ public class TwinderServlet extends HttpServlet {
   }
 
   private void produceMessage(JsonObject payload, Connection conn) {
-    FanoutExchange ex = new FanoutExchange();
-    ex.createExchangeAndQueue(conn);
     Producer queueProducer = new Producer(this.connection, payload);
     try {
       queueProducer.send();

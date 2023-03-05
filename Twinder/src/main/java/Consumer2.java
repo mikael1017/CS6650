@@ -4,7 +4,6 @@ import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.DeliverCallback;
 import java.io.IOException;
-import java.util.concurrent.TimeoutException;
 
 public class Consumer2 implements Runnable {
   private static final String QUEUE_NAME = "Twinder";
@@ -20,9 +19,10 @@ public class Consumer2 implements Runnable {
   public void run() {
     try {
       Channel channel = this.connection.createChannel();
-      channel.queueDeclare(QUEUE_NAME, false, false, false, null);
+      channel.basicQos(1);
       DeliverCallback deliverCallback = (consumerTag, delivery) -> {
         String message = new String(delivery.getBody(), "UTF-8");
+        channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
         JsonObject jsonObject = new JsonParser().parse(message).getAsJsonObject();
         String swipe = jsonObject.get("swipe").getAsString();
         String swiperId = jsonObject.get("swiper").getAsString();
@@ -30,20 +30,15 @@ public class Consumer2 implements Runnable {
         if (swipe.equals("right")) {
           potentialMatches.add(swiperId, swipeeId);
         }
-        System.out.println("Received message: " + message);
+//        System.out.println("Received message: " + message);
       };
 
-      channel.basicConsume(QUEUE_NAME, true, deliverCallback, consumerTag -> {
-      });
-      channel.basicConsume(FanoutExchange.QUEUE_NAME_2, true, deliverCallback, consumerTag -> {});
-
+//      channel.basicConsume(QUEUE_NAME, true, deliverCallback, consumerTag -> {
+//      });
+      channel.basicConsume(FanoutExchange.QUEUE_NAME_2, false, deliverCallback, consumerTag -> {});
       // Wait for messages to be consumed
-      Thread.sleep(5000);
-
-      System.out.println(potentialMatches.toString());
+//      System.out.println(potentialMatches.toString());
     } catch (IOException e) {
-      throw new RuntimeException(e);
-    } catch (InterruptedException e) {
       throw new RuntimeException(e);
     }
   }
