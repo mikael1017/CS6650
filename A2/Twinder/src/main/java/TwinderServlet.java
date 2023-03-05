@@ -1,7 +1,6 @@
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import java.io.BufferedReader;
@@ -25,12 +24,15 @@ public class TwinderServlet extends HttpServlet {
   @Override
   public void init() throws ServletException {
     factory = new ConnectionFactory();
-    factory.setHost("ec2-54-187-74-227.us-west-2.compute.amazonaws.com");
+    factory.setHost("ec2-52-12-168-19.us-west-2.compute.amazonaws.com");
     factory.setUsername("jaewoo");
     factory.setPassword("wodn1017");
     factory.setVirtualHost("cherry_broker");
+    System.out.println("Initialized");
     try {
       connection = factory.newConnection();
+
+      System.out.println("hello");
     } catch (IOException e) {
       throw new RuntimeException("Error initializing RMQ connection", e);
     } catch (TimeoutException e) {
@@ -42,7 +44,7 @@ public class TwinderServlet extends HttpServlet {
   @Override
   protected void doPost(HttpServletRequest request, HttpServletResponse response)
       throws ServletException, IOException {
-    Channel channel = this.connection.createChannel();
+//    Channel channel = this.connection.createChannel();
     System.out.println(this.connection.toString());
     String urlPath = request.getPathInfo();
     PrintWriter out = response.getWriter();
@@ -62,14 +64,8 @@ public class TwinderServlet extends HttpServlet {
       json.addProperty("swipe", leftOrRight);
       statusMessage.setMessage("Created!");
       gson.toJson(statusMessage);
-      Producer queueProducer = new Producer(this.connection.createChannel(), json);
       System.out.println("Start sending a payload to rmq");
-      try {
-        queueProducer.send();
-      } catch (TimeoutException e) {
-        System.out.println("Timeout error");
-        throw new RuntimeException(e);
-      }
+      produceMessage(json, this.connection);
       System.out.println("Successful");
     } else {
       response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -79,6 +75,17 @@ public class TwinderServlet extends HttpServlet {
     out.write("" + response.getStatus());
   }
 
+  private void produceMessage(JsonObject payload, Connection conn) {
+    Producer queueProducer = new Producer(this.connection, payload);
+    try {
+      queueProducer.send();
+    } catch (TimeoutException e) {
+      System.out.println("Timeout error");
+      throw new RuntimeException(e);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
   private boolean isUrlValid(String[] urlParts) {
     if (urlParts.length != 2) {
       return false;

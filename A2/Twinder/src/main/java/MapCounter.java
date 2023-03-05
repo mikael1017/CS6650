@@ -1,5 +1,6 @@
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class MapCounter {
 
@@ -7,7 +8,7 @@ public class MapCounter {
 
 
   public MapCounter() {
-    counter = new HashMap<>();
+    this.counter = new ConcurrentHashMap<>();
   }
   synchronized public void add(String swiperId) {
     this.counter.put(swiperId, this.counter.getOrDefault(swiperId, 0) + 1);

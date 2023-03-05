@@ -9,7 +9,7 @@
   </servlet>
 
   <servlet-mapping>
-  <servlet-name>Twinder</servlet-name>
-  <url-pattern>/swipe/*</url-pattern>
+    <servlet-name>Twinder</servlet-name>
+    <url-pattern>/swipe/*</url-pattern>
   </servlet-mapping>
 </web-app>

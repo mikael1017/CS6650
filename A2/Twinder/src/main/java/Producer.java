@@ -10,22 +10,19 @@ public class Producer {
   private final static String QUEUE_NAME = "Twinder";
   private static JsonObject payload = null;
   private Connection connection;
-  private Channel channel;
-
-  public Producer(Channel channel, JsonObject payload) {
+  public Producer(Connection connection, JsonObject payload) {
     this.payload = payload;
-    this.channel = channel;
+    this.connection = connection;
   }
 
   public void send() throws IOException, TimeoutException {
     System.out.println("Send method started");
     System.out.println(this.payload.toString());
     System.out.println("Create a new channel...");
-//    Channel channel = this.connection.createChannel();
+    Channel channel = this.connection.createChannel();
     System.out.println("Created a new channel");
-    channel.queueDeclare(QUEUE_NAME, false, false, false, null);
     System.out.println("Producer sending....");
-    channel.basicPublish("", QUEUE_NAME, null, this.payload.toString().getBytes(StandardCharsets.UTF_8));
+    channel.basicPublish(FanoutExchange.EXCHANGE_NAME, FanoutExchange.ROUTING_KEY, null, this.payload.toString().getBytes(StandardCharsets.UTF_8));
     System.out.println("Producer sent successfully");
     System.out.println(" [x] Sent '" + "hello" + "'");
     System.out.println("done");
