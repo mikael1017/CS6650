@@ -21,12 +21,12 @@ public class Consumer1Jar {
     ex.createExchangeAndQueue(connection);
     System.out.println("Consumer started");
     System.out.println("Consumer 1");
-    MapCounter likeCounter = new MapCounter();
-    MapCounter dislikeCounter = new MapCounter();
-    Runnable consumer1 = new Consumer1(connection, likeCounter, dislikeCounter);
+//    Runnable consumer1 = new Consumer1(connection, mdbClient);
     for (int i = 0; i < THREAD_NUM; i++) {
       new Thread(consumer1).start();
     }
+
+//    after it collects all the data and sorted from the temp
 
   }
 
