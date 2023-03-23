@@ -1,6 +1,10 @@
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import java.io.BufferedReader;
@@ -10,8 +14,9 @@ import javax.servlet.*;
 import javax.servlet.http.*;
 import javax.servlet.annotation.*;
 import java.io.IOException;
+import org.bson.Document;
 
-@WebServlet("/swipe")
+@WebServlet(urlPatterns = {"/swipe", "/matches", "/stats"})
 public class TwinderServlet extends HttpServlet {
 
   final int RANDOMSTRING_LENGTH = 256;
@@ -21,31 +26,59 @@ public class TwinderServlet extends HttpServlet {
   private ConnectionFactory factory;
   private Connection connection;
 
+  private MongoClient mdbClient;
+
   @Override
   public void init() throws ServletException {
-    factory = new ConnectionFactory();
-    factory.setHost("ec2-52-12-168-19.us-west-2.compute.amazonaws.com");
-    factory.setUsername("jaewoo");
-    factory.setPassword("wodn1017");
-    factory.setVirtualHost("cherry_broker");
-    System.out.println("Initialized");
-    try {
-      connection = factory.newConnection();
+    this.mdbClient = MongoClients.create("mongodb+srv://jaewoo:wodn1017@cs6650.o3m9wao.mongodb.net/?retryWrites=true&w=majority");
+  }
+  @Override
+  protected void doGet(HttpServletRequest request, HttpServletResponse response) {
+    String urlPath = request.getPathInfo();
+    String serviceId = urlPath.substring(0, 1);
+    String userID = urlPath.substring(1);
 
-      System.out.println("hello");
-    } catch (IOException e) {
-      throw new RuntimeException("Error initializing RMQ connection", e);
-    } catch (TimeoutException e) {
-      throw new RuntimeException(e);
+    switch (serviceId) {
+      case "matches": break;
+
+
+
+      case "stats": break;
+
+
+      default: break;
     }
-    System.out.println(this.connection.toString());
+
+
   }
 
-  @Override
+  private String getMatchData(String userId) {
+//  {
+//    "matchList": [
+//      "string"
+//  ]
+//}
+    return "";
+  }
+  private String getStatsData(String userId) {
+//
+//   {
+//    "numLlikes": 72,
+//    "numDislikes": 489
+//   }
+    return "";
+
+  }
+
+
+
+
+    @Override
   protected void doPost(HttpServletRequest request, HttpServletResponse response)
       throws ServletException, IOException {
-//    Channel channel = this.connection.createChannel();
-    System.out.println(this.connection.toString());
+//    when it receives the post request, it sends the payload to the persistent queue
+//      then when consumer receives the message, writes to swipeData into DB
+
     String urlPath = request.getPathInfo();
     PrintWriter out = response.getWriter();
     response.setCharacterEncoding("UTF-8");
@@ -55,17 +88,14 @@ public class TwinderServlet extends HttpServlet {
     String[] urlParts = urlPath.split("/");
     JsonParser parser = new JsonParser();
     BufferedReader reader = request.getReader();
-    JsonObject json = (JsonObject) parser.parse(ReadBigStringIn(reader));
-
+    Document payload = Document.parse(ReadBigStringIn(reader));
     System.out.println("received the request");
-    if (isUrlValid(urlParts) && isDataValid(json)) {
+    if (isUrlValid(urlParts) && isDataValid(payload)) {
       response.setStatus(HttpServletResponse.SC_CREATED);
-      String leftOrRight = urlParts[1];
-      json.addProperty("swipe", leftOrRight);
       statusMessage.setMessage("Created!");
       gson.toJson(statusMessage);
-      System.out.println("Start sending a payload to rmq");
-      produceMessage(json, this.connection);
+      String leftOrRight = urlParts[1];
+      payload.append("swipe", leftOrRight);
       System.out.println("Successful");
     } else {
       response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -75,17 +105,12 @@ public class TwinderServlet extends HttpServlet {
     out.write("" + response.getStatus());
   }
 
-  private void produceMessage(JsonObject payload, Connection conn) {
-    Producer queueProducer = new Producer(this.connection, payload);
-    try {
-      queueProducer.send();
-    } catch (TimeoutException e) {
-      System.out.println("Timeout error");
-      throw new RuntimeException(e);
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
+  private void send(Document payload) {
+    MongoDatabase db = this.mdbClient.getDatabase("twinderDB");
+    MongoCollection col = db.getCollection("tempStore");
+    col.insertOne(payload);
   }
+
   private boolean isUrlValid(String[] urlParts) {
     if (urlParts.length != 2) {
       return false;
@@ -98,16 +123,16 @@ public class TwinderServlet extends HttpServlet {
     return true;
   }
 
-  private boolean isDataValid(JsonObject json) {
+  private boolean isDataValid(Document data) {
 //    validate whether the input json payload contains correct parameters
-    if (!json.has("swiper") || !json.has("swipee") || !json.has("comment")) {
+    if (!data.containsKey("swiper") || !data.containsKey("swipee") || !data.containsKey("comment")) {
 //      System.out.println("no parameter");
       return false;
     }
-    int swiperNum = json.get("swiper").getAsInt();
-    int swipeeNum = json.get("swipee").getAsInt();
+    int swiperNum = data.getInteger("swiper");
+    int swipeeNum = data.getInteger("swipee");
 
-    if (json.get("comment").getAsString().length() != RANDOMSTRING_LENGTH) {
+    if (data.getString("comment").length() != RANDOMSTRING_LENGTH) {
       System.out.println("wrong length");
       return false;
     }

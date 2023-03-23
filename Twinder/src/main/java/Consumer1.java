@@ -1,20 +1,16 @@
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.mongodb.client.MongoClient;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.DeliverCallback;
 import java.io.IOException;
 
 public class Consumer1 implements Runnable {
-  private static final String QUEUE_NAME = "Twinder";
-  private MapCounter likeCounter;
-  private MapCounter dislikeCounter;
+  private MongoClient mdbClient;
 
-  private Connection connection;
-  public Consumer1(Connection connection, MapCounter likeCounter, MapCounter dislikeCounter) {
-    this.connection = connection;
-    this.likeCounter = likeCounter;
-    this.dislikeCounter = dislikeCounter;
+  public Consumer1(MongoClient mdbClient) {
+    this.mdbClient = mdbClient;
   }
 
   @Override
@@ -32,22 +28,11 @@ public class Consumer1 implements Runnable {
         if (swipe.equals("right")) {
 //        like
 //          System.out.println("added to like counter");
-          this.likeCounter.add(swiperId);
         } else {
 //          System.out.println("added to dislike counter");
-          this.dislikeCounter.add(swiperId);
         }
       };
 
-//      channel.basicConsume(QUEUE_NAME, true, deliverCallback, consumerTag -> {
-//      });
-      channel.basicConsume(FanoutExchange.QUEUE_NAME_1, false, deliverCallback, consumerTag -> {});
-
-      // Wait for messages to be consumed
-
-//      System.out.println("All messages received:");
-//      System.out.println(this.likeCounter.toString());
-//      System.out.println(this.dislikeCounter.toString());
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
