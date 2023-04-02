@@ -22,7 +22,7 @@ public class Consumer1 implements Runnable {
   private MongoDatabase db;
 
   private RMQChannelPool pool;
-  private int BATCH_SIZE = 15;
+  private int BATCH_SIZE = 50;
   public Consumer1(RMQChannelPool pool, MongoDatabase db) {
     this.db = db;
     this.pool = pool;
@@ -57,6 +57,8 @@ public class Consumer1 implements Runnable {
 //        create a new payload
         Document payload = new Document("_id", swipeeId);
 
+        payload.append("swipee", swipeeId);
+
         switch (swipe) {
           case "right":
 //            System.out.println("right");
@@ -74,15 +76,21 @@ public class Consumer1 implements Runnable {
 //          System.out.println("Batch " + batchCount + " is full, sending to db");
           MongoCollection likeColl = db.getCollection("likes");
           MongoCollection dislikeColl = db.getCollection("dislikes");
+
+
+          MongoCollection likeCountColl = db.getCollection("likeCount");
+          MongoCollection dislikeCountColl = db.getCollection("dislikeCount");
           System.out.println("sending the message to the collection: ");
 
-//          likeColl.insertMany(likeList);
-//          dislikeColl.insertMany(dislikeList);
+//          System.out.println("likeList size: " + likeList.size());
+//          System.out.println("dislikeList size: " + dislikeList.size());
+          likeCountColl.insertMany(likeList);
+          dislikeCountColl.insertMany(dislikeList);
           UpdateOptions options = new UpdateOptions().upsert(true);
           long startTime = System.currentTimeMillis();
 
 //    new ClientThread(barrier).start();
-//
+
 //          for (Document doc : likeList) {
 //            likeColl.updateOne(new Document("_id", doc.getString("_id")),
 //                inc("numLikes", 1), options);

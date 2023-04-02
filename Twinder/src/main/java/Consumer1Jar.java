@@ -9,11 +9,11 @@ import java.util.concurrent.TimeoutException;
 public class Consumer1Jar {
 
   public static String QUEUE_NAME = "tempStore";
-  private static final int THREAD_NUM = 200;
+  private static final int THREAD_NUM = 100;
   public static void main(String[] args) throws IOException, TimeoutException {
     ConnectionFactory factory = new ConnectionFactory();
     System.out.println("Connecting...");
-    factory.setHost("ec2-54-218-193-93.us-west-2.compute.amazonaws.com");
+    factory.setHost("ec2-34-223-248-19.us-west-2.compute.amazonaws.com");
     factory.setUsername("jaewoo");
     factory.setVirtualHost("cherry_broker");
     factory.setPassword("wodn1017");
@@ -28,8 +28,6 @@ public class Consumer1Jar {
     System.out.println("Consumer 1");
     MongoClient mdbClient = MongoClients.create("mongodb+srv://jaewoo:wodn1017@cs6650.o3m9wao.mongodb.net/?retryWrites=true&w=majority");
     MongoDatabase db = mdbClient.getDatabase("twinderDB");
-    MapCounter likeCounter = new MapCounter();
-    MapCounter dislikeCounter = new MapCounter();
     Runnable consumer1 = new Consumer1(pool, db);
     for (int i = 0; i < THREAD_NUM; i++) {
       new Thread(consumer1).start();

@@ -50,7 +50,7 @@ public class TwinderServlet extends HttpServlet {
   @Override
   public void init() throws ServletException {
     factory = new ConnectionFactory();
-    factory.setHost("ec2-54-218-193-93.us-west-2.compute.amazonaws.com");
+    factory.setHost("ec2-34-223-248-19.us-west-2.compute.amazonaws.com");
     factory.setUsername("jaewoo");
     factory.setPassword("wodn1017");
     factory.setVirtualHost("cherry_broker");
@@ -161,16 +161,28 @@ public class TwinderServlet extends HttpServlet {
   private JsonObject getStatsData(String userId) {
     MongoCollection likeCollection = this.db.getCollection("likes");
     MongoCollection dislikeCollection = this.db.getCollection("dislikes");
-//    likeCounter = likeCollection.find(new Document("_id", userId)).cursor();
-//    MongoCursor<Document> dislikeCounter = dislikeCollection.find(new Document("_id", userId)).cursor();
+    MongoCollection likeCountColl = db.getCollection("likeCount");
+    MongoCollection dislikeCountColl = db.getCollection("dislikeCount");
+
+//    MongoCursor<Document> likeCounter = likeCountColl.find(new Document("_id", userId)).cursor();
+//    MongoCursor<Document> dislikeCounter = dislikeCountColl.find(new Document("_id", userId)).cursor();
     FindIterable<Document> likeDoc = likeCollection.find(new Document("_id", userId));
     FindIterable<Document> dislikeDoc = dislikeCollection.find(new Document("_id", userId));
-    if (likeDoc == null || dislikeDoc == null) {
-      return null;
-    }
-
+//    if (likeDoc == null || dislikeDoc == null) {
+//      return null;
+//    }
+//
     int numLikes = likeDoc.first().getInteger("numLikes");
     int numDislikes = dislikeDoc.first().getInteger("numDislikes");
+//   int numLikes = 0;
+//   int numDislikes = 0;
+//    while (likeCounter.hasNext()) {
+//      numLikes += 1;
+//    }
+//
+//    while (dislikeCounter.hasNext()) {
+//      numDislikes += 1;
+//    }
     JsonObject resultObject = new JsonObject();
     resultObject.addProperty("numLikes", numLikes);
     resultObject.addProperty("numDislikes", numDislikes);
@@ -208,7 +220,6 @@ public class TwinderServlet extends HttpServlet {
     if (isUrlValid(urlParts) && isDataValid(json)) {
       String leftOrRight = urlParts[2];
       json.addProperty("swipe", leftOrRight);
-      json.addProperty("request", "POST");
       statusMessage.setMessage("Created!");
       gson.toJson(statusMessage);
 //      System.out.println("Start sending a payload to rmq");
