@@ -3,14 +3,22 @@
     <output-path>$PROJECT_DIR$/out/artifacts/Twinder_jar</output-path>
     <root id="archive" name="Twinder.jar">
       <element id="module-output" name="Twinder" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/mongodb/bson-record-codec/4.9.0/bson-record-codec-4.9.0.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/mongodb/mongodb-driver-sync/4.9.0/mongodb-driver-sync-4.9.0.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/mongodb/mongodb-driver-core/4.9.0/mongodb-driver-core-4.9.0.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/rabbitmq/amqp-client/5.16.0/amqp-client-5.16.0.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/mongodb/bson/4.9.0/bson-4.9.0.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/apache/commons/commons-pool2/2.11.1/commons-pool2-2.11.1.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/slf4j/slf4j-api/1.7.36/slf4j-api-1.7.36.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/google/code/gson/gson/2.10.1/gson-2.10.1.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/slf4j/slf4j-api/1.7.36/slf4j-api-1.7.36.jar" path-in-jar="/" />
       <element id="library" level="project" name="Maven: com.google.code.gson:gson:2.10.1" />
       <element id="library" level="project" name="Maven: org.apache.commons:commons-pool2:2.11.1" />
-      <element id="library" level="project" name="Maven: org.slf4j:slf4j-api:1.7.36" />
       <element id="library" level="project" name="Maven: com.rabbitmq:amqp-client:5.16.0" />
+      <element id="library" level="project" name="Maven: org.mongodb:bson:4.9.0" />
+      <element id="library" level="project" name="Maven: org.mongodb:bson-record-codec:4.9.0" />
+      <element id="library" level="project" name="Maven: org.mongodb:mongodb-driver-sync:4.9.0" />
+      <element id="library" level="project" name="Maven: org.mongodb:mongodb-driver-core:4.9.0" />
+      <element id="library" level="project" name="Maven: org.slf4j:slf4j-api:1.7.36" />
     </root>
   </artifact>
 </component>

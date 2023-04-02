@@ -35,7 +35,7 @@ public class Consumer2 implements Runnable {
 
 //      channel.basicConsume(QUEUE_NAME, true, deliverCallback, consumerTag -> {
 //      });
-      channel.basicConsume(FanoutExchange.QUEUE_NAME_2, false, deliverCallback, consumerTag -> {});
+//      channel.basicConsume(FanoutExchange.QUEUE_NAME_2, false, deliverCallback, consumerTag -> {});
       // Wait for messages to be consumed
 //      System.out.println(potentialMatches.toString());
     } catch (IOException e) {

@@ -10,6 +10,6 @@
 
   <servlet-mapping>
     <servlet-name>Twinder</servlet-name>
-    <url-pattern>/swipe/*</url-pattern>
+    <url-pattern>/api/*</url-pattern>
   </servlet-mapping>
 </web-app>

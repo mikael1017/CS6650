@@ -12,7 +12,7 @@ public class ClientThread extends Thread {
   private static final int RANDOMSTRING_LENGTH = 256;
   private static final int MAX_RETRIES = 1;
 
-  private final static int NUM_REQUESTS = 2500;
+  private final static int NUM_REQUESTS = 5000;
   private final CountDownLatch latch;
   private final RequestCounter counter;
   private final RequestCounter failCounter;
