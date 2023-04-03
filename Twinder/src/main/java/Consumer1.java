@@ -2,27 +2,27 @@
 
 import static com.mongodb.client.model.Updates.inc;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.BulkWriteOptions;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.UpdateManyModel;
 import com.mongodb.client.model.UpdateOptions;
 import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.DeliverCallback;
-import com.rabbitmq.client.Delivery;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.bson.Document;
+import org.bson.conversions.Bson;
 
 public class Consumer1 implements Runnable {
   private static final String QUEUE_NAME = "tempStore";
   private MongoDatabase db;
 
   private RMQChannelPool pool;
-  private int BATCH_SIZE = 50;
+  private int BATCH_SIZE = 500;
   public Consumer1(RMQChannelPool pool, MongoDatabase db) {
     this.db = db;
     this.pool = pool;
@@ -52,22 +52,23 @@ public class Consumer1 implements Runnable {
         String swipeeId = incomingMessage.getString("swipee");
         String swipe = incomingMessage.getString("swipe");
 //        System.out.println(swipe);
-        String collectionName = "";
+//        String collectionName = "";
 
 //        create a new payload
-        Document payload = new Document("_id", swipeeId);
+//        Document payload = new Document("_id", swipeeId);
 
-        payload.append("swipee", swipeeId);
+//        payload.append("swipee", swipeeId);
+//        bulkwrite()
 
         switch (swipe) {
           case "right":
 //            System.out.println("right");
-            likeList.add(payload);
+            likeList.add(new Document("_id", swipeeId));
             break;
 
           case "left":
 //            System.out.println("left");
-            dislikeList.add(payload);
+            dislikeList.add(new Document("_id", swipeeId));
             break;
         }
 
@@ -76,30 +77,46 @@ public class Consumer1 implements Runnable {
 //          System.out.println("Batch " + batchCount + " is full, sending to db");
           MongoCollection likeColl = db.getCollection("likes");
           MongoCollection dislikeColl = db.getCollection("dislikes");
+          List<UpdateManyModel<Document>> udpateModels = new ArrayList<>();
+          for (Document doc : likeList) {
+            udpateModels.add(new UpdateManyModel<>(Filters.eq("_id", doc.get("_id")), inc("numLikes", 1), new UpdateOptions().upsert(true)));
+          }
+          for (Document doc : dislikeList) {
+            udpateModels.add(new UpdateManyModel<>(Filters.eq("_id", doc.get("_id")), inc("numDisLikes", 1), new UpdateOptions().upsert(true)));
+          }
 
+          BulkWriteOptions options = new BulkWriteOptions().ordered(false);
 
-          MongoCollection likeCountColl = db.getCollection("likeCount");
-          MongoCollection dislikeCountColl = db.getCollection("dislikeCount");
+//          MongoCollection likeCountColl = db.getCollection("likeCount");
+//          MongoCollection dislikeCountColl = db.getCollection("dislikeCount");
           System.out.println("sending the message to the collection: ");
 
 //          System.out.println("likeList size: " + likeList.size());
 //          System.out.println("dislikeList size: " + dislikeList.size());
-          likeCountColl.insertMany(likeList);
-          dislikeCountColl.insertMany(dislikeList);
-          UpdateOptions options = new UpdateOptions().upsert(true);
+//          likeCountColl.insertMany(likeList);
+//          dislikeCountColl.insertMany(dislikeList);
           long startTime = System.currentTimeMillis();
 
-//    new ClientThread(barrier).start();
+          likeColl.bulkWrite(udpateModels, options);
+//          Bson regexFilter = Filters.regex("id", "^(" + String.join("|", likeList) + ")$");
 
-//          for (Document doc : likeList) {
-//            likeColl.updateOne(new Document("_id", doc.getString("_id")),
-//                inc("numLikes", 1), options);
+//          for (String userId: likeList) {
+//            likeColl.updateOne(new Document("_id", userId), new Document("$inc", new Document("numLikes", 1)), new UpdateOptions().upsert(true));
 //          }
 //
-//          for (Document doc : dislikeList) {
-//            dislikeColl.updateOne(new Document("_id", doc.getString("_id")),
-//                inc("numDislikes", 1), options);
+//          for (String userId : dislikeList) {
+//            dislikeColl.updateOne(new Document("_id", userId), new Document("$inc", new Document("numDisLikes", 1)), new UpdateOptions().upsert(true));
 //          }
+//
+//          UpdateOptions options = new UpdateOptions().upsert(true);
+//          Bson likeFilter = Filters.in("_id", likeList);
+//          Bson likeUpdate = new Document("$inc", new Document("numLikes", 1));
+//          Bson dislikeFilter = Filters.in("_id", dislikeList);
+//          Bson dislikeUpdate = new Document("$inc", new Document("numDisLikes", 1));
+//          likeColl.updateMany(likeFilter, likeUpdate, options);
+//          dislikeColl.updateMany(dislikeFilter, dislikeUpdate, options);
+
+//
           long endTime = System.currentTimeMillis();
           long totalTime = endTime - startTime;
           System.out.println("Time taken to update the db: " + totalTime);

@@ -13,7 +13,7 @@ public class Consumer1Jar {
   public static void main(String[] args) throws IOException, TimeoutException {
     ConnectionFactory factory = new ConnectionFactory();
     System.out.println("Connecting...");
-    factory.setHost("ec2-34-223-248-19.us-west-2.compute.amazonaws.com");
+    factory.setHost("ec2-52-26-208-234.us-west-2.compute.amazonaws.com");
     factory.setUsername("jaewoo");
     factory.setVirtualHost("cherry_broker");
     factory.setPassword("wodn1017");

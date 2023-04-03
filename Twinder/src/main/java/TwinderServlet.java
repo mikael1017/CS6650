@@ -28,6 +28,8 @@ import javax.servlet.http.*;
 import javax.servlet.annotation.*;
 import java.io.IOException;
 import org.bson.Document;
+import org.bson.conversions.Bson;
+import org.bson.types.ObjectId;
 
 @WebServlet("/twinder")
 public class TwinderServlet extends HttpServlet {
@@ -50,7 +52,7 @@ public class TwinderServlet extends HttpServlet {
   @Override
   public void init() throws ServletException {
     factory = new ConnectionFactory();
-    factory.setHost("ec2-34-223-248-19.us-west-2.compute.amazonaws.com");
+    factory.setHost("ec2-52-26-208-234.us-west-2.compute.amazonaws.com");
     factory.setUsername("jaewoo");
     factory.setPassword("wodn1017");
     factory.setVirtualHost("cherry_broker");
@@ -73,7 +75,7 @@ public class TwinderServlet extends HttpServlet {
   @Override
   protected void doGet(HttpServletRequest request, HttpServletResponse response)
       throws IOException {
-//    System.out.println("received a get request");
+    System.out.println("received a get request");
     String urlPath = request.getPathInfo();
     String[] urlParts = urlPath.split("/");
     PrintWriter out = response.getWriter();
@@ -90,9 +92,8 @@ public class TwinderServlet extends HttpServlet {
       String userID = urlParts[2];
 //      String userID = ;
       JsonObject result = new JsonObject();
-//      System.out.println("service id: " + serviceId);
-//      System.out.println("user id: " + userID);
-//      produceMessage(result);
+      System.out.println("service id: " + serviceId);
+      System.out.println("user id: " + userID);
       switch (serviceId) {
         case "matches":
           result = getMatchData(userID);
@@ -103,6 +104,7 @@ public class TwinderServlet extends HttpServlet {
         default:
           break;
       }
+      System.out.println("hello");
       if (result == null) {
 //        404 user not found
         System.out.println("404 user not found");
@@ -110,7 +112,7 @@ public class TwinderServlet extends HttpServlet {
         out.write("404 user not found" + response.getStatus());
       }
 //
-//      System.out.println("result is " + result.toString());
+      System.out.println("result is " + result.toString());
       response.setContentType("application/json");
       response.setStatus(HttpServletResponse.SC_OK);
       out.write(new Gson().toJson(result));
@@ -159,21 +161,26 @@ public class TwinderServlet extends HttpServlet {
     return result;
   }
   private JsonObject getStatsData(String userId) {
+    System.out.println("get stats data");
     MongoCollection likeCollection = this.db.getCollection("likes");
-    MongoCollection dislikeCollection = this.db.getCollection("dislikes");
-    MongoCollection likeCountColl = db.getCollection("likeCount");
-    MongoCollection dislikeCountColl = db.getCollection("dislikeCount");
-
-//    MongoCursor<Document> likeCounter = likeCountColl.find(new Document("_id", userId)).cursor();
+    MongoCursor<Document> likeCounter = likeCollection.find(new Document("_id", userId)).cursor();
 //    MongoCursor<Document> dislikeCounter = dislikeCountColl.find(new Document("_id", userId)).cursor();
-    FindIterable<Document> likeDoc = likeCollection.find(new Document("_id", userId));
-    FindIterable<Document> dislikeDoc = dislikeCollection.find(new Document("_id", userId));
+
+//    FindIterable<Document> likeDoc = likeCollection.find(new Document("_id", userId));
+//    FindIterable<Document> dislikeDoc = dislikeCollection.find(new Document("_id", userId));
 //    if (likeDoc == null || dislikeDoc == null) {
 //      return null;
 //    }
-//
-    int numLikes = likeDoc.first().getInteger("numLikes");
-    int numDislikes = dislikeDoc.first().getInteger("numDislikes");
+    JsonObject resultObject = new JsonObject();
+   if (likeCounter.hasNext()) {
+     Document curr = likeCounter.next();
+     int numLikes = curr.getInteger("numLikes");
+     int numDislikes = curr.getInteger("numDislikes");
+     resultObject.addProperty("numLikes", numLikes);
+     resultObject.addProperty("numDislikes", numDislikes);
+     return resultObject;
+   }
+   return resultObject;
 //   int numLikes = 0;
 //   int numDislikes = 0;
 //    while (likeCounter.hasNext()) {
@@ -183,10 +190,8 @@ public class TwinderServlet extends HttpServlet {
 //    while (dislikeCounter.hasNext()) {
 //      numDislikes += 1;
 //    }
-    JsonObject resultObject = new JsonObject();
-    resultObject.addProperty("numLikes", numLikes);
-    resultObject.addProperty("numDislikes", numDislikes);
-    return resultObject;
+
+
   }
 
   private Integer getCounter(MongoCollection coll, String swiperId) {

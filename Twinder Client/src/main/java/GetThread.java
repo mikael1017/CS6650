@@ -54,9 +54,9 @@ public class GetThread implements Runnable {
             System.out.println("sending the request to the server");
             long before = System.currentTimeMillis();
 //            change this part to manual http request
-            manualHttpRequest(userId);
+//            manualHttpRequest(userId);
 
-//            statsInstance.matchStats(userId);
+            statsInstance.matchStats(userId);
 //                      matchInstance.matches(swiperId);
             long after = System.currentTimeMillis();
             System.out.println("got result");
@@ -67,7 +67,7 @@ public class GetThread implements Runnable {
             needToRetry = false;
 
 
-          } catch (IOException e) {
+          } catch (ApiException e) {
             throw new RuntimeException(e);
           }
           this.counter.inc();
@@ -79,7 +79,7 @@ public class GetThread implements Runnable {
 
   private void manualHttpRequest(String userId) throws IOException {
     // TODO Auto-generated method stub
-    URL url = new URL("http://ec2-35-162-108-4.us-west-2.compute.amazonaws.com:8080/Twinder_war/api/stats/" + userId);
+    URL url = new URL("http://localhost:8080/twinder/api/stats/" + userId);
     HttpURLConnection con = (HttpURLConnection) url.openConnection();
     con.setRequestMethod("GET");
 
